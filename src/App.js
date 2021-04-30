@@ -21,7 +21,10 @@ class App extends React.Component {
       <div className='app-container'>
         <SidebarComponent
             selectedNoteIndex={this.state.selectedNoteIndex}
-            notes={this.state.notes}>
+            notes={this.state.notes}
+            deleteNote={this.deleteNote}
+            selectNote={this.selectNote}
+            newNote={this.newNote}>
         </SidebarComponent>
         <EditorComponent></EditorComponent>
       </div>
