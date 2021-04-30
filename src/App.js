@@ -1,6 +1,9 @@
 import React from 'react';
 import './App.css';
-import {projectFirestore} from './firebase/Config'
+import {projectFirestore} from './firebase/Config';
+import SidebarComponent from './sidebar/sidebar';
+import EditorComponent from './editor/editor';
+
 
 class App extends React.Component {
   
@@ -15,7 +18,10 @@ class App extends React.Component {
 
   render(){
     return(
-      <div>HELLO WORLD</div>
+      <div className='app-container'>
+        <SidebarComponent></SidebarComponent>
+        <EditorComponent></EditorComponent>
+      </div>
     )
   }
 
