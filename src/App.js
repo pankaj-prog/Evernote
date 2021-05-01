@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import {projectFirestore} from './firebase/Config';
+import {currentTimestamp, projectFirestore} from './firebase/Config';
 import SidebarComponent from './sidebar/sidebar';
 import EditorComponent from './editor/editor';
 
@@ -26,7 +26,16 @@ class App extends React.Component {
             selectNote={this.selectNote}
             newNote={this.newNote}>
         </SidebarComponent>
-        <EditorComponent></EditorComponent>
+        {
+          this.state.selectedNote ?
+          <EditorComponent
+            selectedNote={this.state.selectedNote}
+            selectedNoteIndex={this.state.selectedNoteIndex}
+            notes={this.state.notes}
+            noteUpdate={this.noteUpdate} >
+
+          </EditorComponent> : null
+        }
       </div>
     )
   }
@@ -44,7 +53,57 @@ class App extends React.Component {
         this.setState({ notes: notes });
       });
   }
-  
+
+  selectNote = (note,index)=>{
+    this.setState({ selectedNoteIndex : index , selectedNote : note });
+  };
+
+  noteUpdate=(id,noteObj)=>{
+    projectFirestore
+    .collection('notes')
+    .doc(id)
+    .update({
+      title : noteObj.title,
+      body : noteObj.body,
+      timestamp: currentTimestamp
+    });
+  };
+
+  newNote = async (title) => {
+    const note = {
+      title: title,
+      body: ''
+    };
+    const newFromDB = await 
+      projectFirestore
+      .collection('notes')
+      .add({
+        title: note.title,
+        body: note.body,
+        timestamp: currentTimestamp
+      });
+    const newID = newFromDB.id;
+    await this.setState({ notes: [...this.state.notes, note] });
+    const newNoteIndex = this.state.notes.indexOf(this.state.notes.filter(_note => _note.id === newID)[0]);
+    this.setState({ selectedNote: this.state.notes[newNoteIndex], selectedNoteIndex: newNoteIndex });
+  }
+
+  deleteNote = async (note) => {
+    const noteIndex = this.state.notes.indexOf(note);
+    await this.setState({ notes: this.state.notes.filter(_note => _note !== note) });
+    if(this.state.selectedNoteIndex === noteIndex) {
+      this.setState({ selectedNoteIndex: null, selectedNote: null });
+    } else {
+      this.state.notes.length > 1 ?
+      this.selectNote(this.state.notes[this.state.selectedNoteIndex - 1], this.state.selectedNoteIndex - 1) :
+      this.setState({ selectedNoteIndex: null, selectedNote: null });
+    }
+
+    projectFirestore
+      .collection('notes')
+      .doc(note.id)
+      .delete();
+  }
 
 }
 

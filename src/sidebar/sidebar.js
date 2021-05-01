@@ -26,7 +26,7 @@ class SidebarComponent extends React.Component{
                     <Button
                         onClick={this.newNoteBtnClick}
                         className={classes.newNoteBtn}>
-                            { this.state.addingNote ? 'Cancel':'New Note'}
+                            { this.state.addingNote ? 'Cancel':'+Add Note'}
                     </Button>
                     {
                         this.state.addingNote ?
@@ -78,14 +78,15 @@ class SidebarComponent extends React.Component{
     };
 
     newNote=()=>{
-        console.log(this.state);
+        this.props.newNote(this.state.title);
+        this.setState({ title: null, addingNote: false});
     }
 
-    selectNote = ()=>{
-        console.log('select note')
+    selectNote = (n,i)=>{
+        this.props.selectNote(n,i);
     }
-    deleteNote = ()=>{
-        console.log('delete note')
+    deleteNote = (note)=>{
+        this.props.deleteNote(note);
     }
 
 }
